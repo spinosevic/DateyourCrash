@@ -55,7 +55,6 @@ class UsersController < ApplicationController
 
   def match
     @user=User.all.find{|x| x.id==params['userId']}
-    debugger
     @matches=params['array'].map{|match| match['id']}
     @matches.each do |match_id|
       @match=User.find{|x| x.id==match_id}
@@ -85,7 +84,7 @@ render json: @user.matches
   private
 
   def user_params
-    params.require(:user).permit(:username, :password_digest, :name, :gender, :interest, :url)
+    params.require(:user).permit(:username, :password, :name, :gender, :interest, :url)
   end
   def characteristic_params
     params.require(:user).permit(:data)
