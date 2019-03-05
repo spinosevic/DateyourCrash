@@ -66,10 +66,26 @@ render json: @user.matches
 
   end
 
+  def message
+    @user=User.all.find{|x| x.id==params['message']['sender_id']}
+    message=params['message']
+    message.permit!
+    @message=Message.create(message)
+
+    render json: @message
+  end
+
+  def messages
+    userId = request.headers['UserId']
+    @messages=Message.all.select{|x| x.sender_id==userId|| x.receiver_id==userId}
+    render json: @messages
+  end
+
+
   private
 
   def user_params
-    params.require(:user).permit(:username, :password, :name, :gender, :interest, :url)
+    params.require(:user).permit(:username, :password_digest, :name, :gender, :interest, :url)
   end
   def characteristic_params
     params.require(:user).permit(:data)
