@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
   def signup
     par=["beard", "mustache", "arched_eyebrows", "big_lips", "big_nose", "black_hair", "blond_hair", "bushy_eyebrows", "chubby", "pale_skin", "straight_hair", "wavy_hair", "heavy_makeup", "high_cheekbones", "narrow_eyes", "pointy_nose", "receding_hairline", "rosy_cheeks", "race", "white", "indian", "hispanic", "asian", "black"]
-    @user=User.create(user_params)
+    @user=User.create(password: params['password'], username: params['username'], url: params['url'], gender: params['gender'], interest: params['interest'], name: params['name'])
     descr_params=params['data']
     descr_params.permit!
     @user.descriptions.create!(descr_params)
@@ -13,9 +13,10 @@ class UsersController < ApplicationController
   end
 
   def login
-
+#     user = User.find_by(username: params[:username])
+# if user && user.authenticate(params[:password])
     @user=User.all.find{|x| x.username==params['user']}
-    if @user.authenticate==params['password']
+    if @user.authenticate(params['password'])===@user
       render json: {user:@user.id, matches:@user.matches}
     else
       render json: "Invalid Username/Password"
@@ -75,16 +76,18 @@ render json: @user.matches
   end
 
   def messages
-    userId = request.headers['UserId']
-    @messages=Message.all.select{|x| x.sender_id==userId|| x.receiver_id==userId}
-    render json: @messages
+
+    userId = request.headers['userId']
+    matchId = request.headers['matchId']
+@messages=Message.all.select{|x| (x.sender_id==userId.to_i || x.receiver_id==userId.to_i)}.select{|y| (y.sender_id==matchId.to_i || y.receiver_id==matchId.to_i)}
+render json: @messages
   end
 
 
   private
 
   def user_params
-    params.require(:user).permit(:username, :password, :name, :gender, :interest, :url)
+    params.require(:user).permit(:username, :password_digest, :name, :gender, :interest, :url)
   end
   def characteristic_params
     params.require(:user).permit(:data)

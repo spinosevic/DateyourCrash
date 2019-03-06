@@ -7,7 +7,7 @@ get 'usersmatch', to:'users#index'
 put 'match', to: 'users#match'
 post 'login', to: 'users#login'
 post 'message', to: 'users#message'
-get 'messages', to: 'users#message'
+get 'messages', to: 'users#messages'
 
 
 
